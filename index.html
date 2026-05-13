@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statut du Système</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f7fb;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 30px 50px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 10px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            background-color: #95a5a6;
+            color: white;
+        }
+        .badge.on {
+            background-color: #2ecc71;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        .badge.off {
+            background-color: #e74c3c;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Statut actuel :</h1>
+        <div id="status-badge" class="badge">Chargement...</div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let status = urlParams.get('status') || urlParams.get('статус');
+
+            const badge = document.getElementById('status-badge');
+
+            if (status) {
+                status = status.toLowerCase().trim();
+            }
+
+            if (status === 'on' || status === 'он') {
+                badge.textContent = 'ON';
+                badge.className = 'badge on';
+            } else if (status === 'off' || status === 'офф' || status === 'оф') {
+                badge.textContent = 'OFF';
+                badge.className = 'badge off';
+            } else {
+                badge.textContent = 'NON DÉFINI';
+                badge.className = 'badge';
+            }
+        }
+        window.onload = updateStatus;
+    </script>
+</body>
+</html>
