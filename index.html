@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statut du Système</title>
+    <title>Status Control Panel</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,72 +12,141 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f5f7fb;
-            color: #333;
+            background-color: #121620;
+            color: white;
         }
         .container {
             text-align: center;
-            background: white;
-            padding: 30px 50px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            background: #1a202c;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
         }
         h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #a0aec0;
+            margin-bottom: 30px;
         }
         .badge {
-            display: inline-block;
-            padding: 10px 30px;
-            font-size: 20px;
+            font-size: 48px;
             font-weight: bold;
-            border-radius: 50px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            background-color: #95a5a6;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
             color: white;
+            transition: color 0.3s ease;
         }
         .badge.on {
-            background-color: #2ecc71;
-            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            color: #2ecc71;
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.4);
         }
         .badge.off {
-            background-color: #e74c3c;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            color: #e74c3c;
+            text-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
+        }
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .btn {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn-on {
+            background-color: #00c851;
+            color: white;
+        }
+        .btn-off {
+            background-color: #ff3547;
+            color: white;
+        }
+        .footer-text {
+            font-size: 12px;
+            color: #718096;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Statut actuel :</h1>
-        <div id="status-badge" class="badge">Chargement...</div>
+        <h1>Status Control Panel</h1>
+        
+        <div id="status-badge" class="badge">STATUS</div>
+
+        <div class="btn-container">
+            <button class="btn btn-on" onclick="setStatus('on')">Turn On</button>
+            <button class="btn btn-off" onclick="setStatus('off')">Turn Off</button>
+        </div>
+
+        <div class="footer-text">
+            Le statut est mémorisé automatiquement. L'URL reste prioritaire si elle contient un paramètre.
+        </div>
     </div>
 
     <script>
-        function updateStatus() {
+        function initStatus() {
             const urlParams = new URLSearchParams(window.location.search);
             let status = urlParams.get('status') || urlParams.get('статус');
 
-            const badge = document.getElementById('status-badge');
-
             if (status) {
                 status = status.toLowerCase().trim();
+                if (status === 'on' || status === 'он') {
+                    applyStatus('ON', 'badge on');
+                    localStorage.setItem('savedStatus', 'on');
+                    return;
+                } else if (status === 'off' || status === 'офф' || status === 'оф') {
+                    applyStatus('OFF', 'badge off');
+                    localStorage.setItem('savedStatus', 'off');
+                    return;
+                }
             }
 
-            if (status === 'on' || status === 'он') {
-                badge.textContent = 'ON';
-                badge.className = 'badge on';
-            } else if (status === 'off' || status === 'офф' || status === 'оф') {
-                badge.textContent = 'OFF';
-                badge.className = 'badge off';
+            const savedStatus = localStorage.getItem('savedStatus');
+            if (savedStatus === 'on') {
+                applyStatus('ON', 'badge on');
+            } else if (savedStatus === 'off') {
+                applyStatus('OFF', 'badge off');
             } else {
-                badge.textContent = 'NON DÉFINI';
-                badge.className = 'badge';
+                applyStatus('STATUS', 'badge');
             }
         }
-        window.onload = updateStatus;
+
+        function setStatus(state) {
+            if (state === 'on') {
+                applyStatus('ON', 'badge on');
+                localStorage.setItem('savedStatus', 'on');
+            } else if (state === 'off') {
+                applyStatus('OFF', 'badge off');
+                localStorage.setItem('savedStatus', 'off');
+            }
+            
+            const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?status=' + state;
+            window.history.pushState({path:newurl}, '', newurl);
+        }
+
+        function applyStatus(text, className) {
+            const badge = document.getElementById('status-badge');
+            badge.textContent = text;
+            badge.className = className;
+        }
+
+        window.onload = initStatus;
     </script>
 </body>
 </html>
